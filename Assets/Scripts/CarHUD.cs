@@ -10,7 +10,11 @@ public class CarHUD : MonoBehaviour
     void Update()
     {
         if (speedText != null && car != null)
-            speedText.text = $"{Mathf.Abs(car.CurrentSpeed):F1} m/s";
+        {
+            speedText.text = $"{car.SpeedKmh:F0} km/h";
+            if (car.IsDrifting) speedText.text += "\nDERRAPE";
+            if (!car.IsGrounded) speedText.text += "\nEN EL AIRE";
+        }
 
         if (rawValuesText != null)
         {
