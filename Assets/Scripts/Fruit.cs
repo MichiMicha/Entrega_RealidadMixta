@@ -1,6 +1,7 @@
 using UnityEngine;
 
 // Pon este script en cada fruta. Necesita un Collider con "Is Trigger" activado.
+// Se "atrapa" cuando la toca el vehículo (VehiclePawn) del profe.
 public class Fruit : MonoBehaviour
 {
     [SerializeField] private float rotateSpeed = 90f;
@@ -24,7 +25,7 @@ public class Fruit : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (collected) return;
-        if (other.GetComponentInParent<CarController>() == null) return;
+        if (other.GetComponentInParent<VehiclePawn>() == null) return;
 
         collected = true;
         if (LevelManager.Instance != null) LevelManager.Instance.FruitCollected();

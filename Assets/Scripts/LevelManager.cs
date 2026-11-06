@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 // Un LevelManager por escena de juego (Tutorial y Juego).
-// Cuenta solo cuántas frutas hay en la escena y cambia de escena al atrapar todas.
+// Cuenta cuántas frutas hay en la escena y cambia de escena al atrapar todas.
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance { get; private set; }
@@ -16,6 +16,9 @@ public class LevelManager : MonoBehaviour
 
     private int total;
     private int collected;
+
+    /// <summary>True cuando ya se atraparon todas las frutas.</summary>
+    public bool IsComplete => total > 0 && collected >= total;
 
     void Awake()
     {
@@ -33,7 +36,7 @@ public class LevelManager : MonoBehaviour
         collected++;
         UpdateUI();
 
-        if (collected >= total)
+        if (IsComplete)
         {
             if (messageText != null) messageText.text = winMessage;
             Invoke(nameof(LoadNext), delayBeforeNextScene);
@@ -48,6 +51,7 @@ public class LevelManager : MonoBehaviour
 
     private void LoadNext()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(nextScene);
     }
 }

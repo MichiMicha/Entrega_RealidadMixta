@@ -1,24 +1,35 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-// Pon este script en un objeto vacío de cada escena de menú.
-// Los botones llaman a LoadScene / QuitGame desde el OnClick.
+// Para las escenas de menú (1_Inicio y 4_Final). Los botones llaman a LoadScene / QuitGame desde el OnClick.
+// Siempre deja un botón seleccionado: así el volante (ArduinoController del profe) puede navegar
+// el menú: toque corto en CICLO = siguiente botón, mantener = presionarlo.
 public class SceneLoader : MonoBehaviour
 {
-    [Header("Botón CONFIRMAR del volante (opcional)")]
-    [SerializeField] private string sceneOnConfirm = "";
-    [SerializeField] private bool quitOnConfirm = false;
+    [Tooltip("Botón que queda seleccionado al abrir la escena. Vacío = el primero que encuentre.")]
+    [SerializeField] private Selectable firstSelected;
+
+    void Start()
+    {
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        SelectFirst();
+    }
 
     void Update()
     {
-        if (!GameInput.ConfirmPressed()) return;
-
-        if (quitOnConfirm) QuitGame();
-        else if (!string.IsNullOrEmpty(sceneOnConfirm)) LoadScene(sceneOnConfirm);
+        // Si se perdió la selección (ej: clic en el vacío), volver a seleccionar algo.
+        if (EventSystem.current == null) return;
+        GameObject selected = EventSystem.current.currentSelectedGameObject;
+        if (selected == null || !selected.activeInHierarchy) SelectFirst();
     }
 
     public void LoadScene(string sceneName)
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(sceneName);
     }
 
@@ -29,5 +40,12 @@ public class SceneLoader : MonoBehaviour
 #else
         Application.Quit();
 #endif
+    }
+
+    private void SelectFirst()
+    {
+        if (EventSystem.current == null) return;
+        Selectable target = firstSelected != null ? firstSelected : FindAnyObjectByType<Selectable>();
+        EventSystem.current.SetSelectedGameObject(target != null ? target.gameObject : null);
     }
 }
