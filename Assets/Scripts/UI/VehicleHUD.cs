@@ -21,9 +21,10 @@ public class VehicleHUD : MonoBehaviour
 
     static readonly string[] directions = { "N", "NE", "E", "SE", "S", "SO", "O", "NO" };
 
+
     void LateUpdate()
     {
-        speedText.text = $"{vehicle.Speed * 3.6f:0}"; // m/s → km/h (negativo = reversa)
+        speedText.text = $"{Mathf.Abs(vehicle.Speed) * 3.6f:0}";
 
         float angle = Mathf.Repeat(vehicle.heading, 360f);
         headingText.text = $"{directions[Mathf.RoundToInt(angle / 45f) % 8]}  {angle:000}°";
