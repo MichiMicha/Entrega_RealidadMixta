@@ -719,6 +719,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4053223405062202079, guid: b4bdd75fd51c2b249a6e6a47a1258677, type: 3}
+      propertyPath: m_SlopeLimit
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 4418626618160848318, guid: b4bdd75fd51c2b249a6e6a47a1258677, type: 3}
+      propertyPath: walkSpeed
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7697440790785955299, guid: b4bdd75fd51c2b249a6e6a47a1258677, type: 3}
       propertyPath: m_Name
       value: Player
@@ -8794,7 +8802,7 @@ MonoBehaviour:
   dynamicsBlendEnd: 6
   counterSteerStart: 5
   counterSteerFull: 15
-  driftSpeedKmh: 60
+  driftSpeedKmh: 40
   driftRampKmh: 9
   driftRearGrip: 0.65
   suspensionLength: 0.5
