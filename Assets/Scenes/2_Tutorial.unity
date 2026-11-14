@@ -8356,34 +8356,54 @@ MonoBehaviour:
   vehicle: {fileID: 605385038}
   stepText: {fileID: 762957588}
   steps:
-  - text: "\xA1Bienvenido! Unas frutas se escaparon y debes atraparlas con el carro."
+  - text: "\xA1Bienvenido! Unas frutas se escaparon y debes atraparlas."
     condition: 0
     value: 4
+    minSpeed: 0
+    freezeAfter: 0
   - text: Mueve el mouse para mirar a tu alrededor.
     condition: 1
     value: 45
+    minSpeed: 0
+    freezeAfter: 1
   - text: Camina con W A S D.
     condition: 2
     value: 2
+    minSpeed: 0
+    freezeAfter: 1
   - text: "Ac\xE9rcate al carro, m\xEDralo y presiona E para subirte."
     condition: 3
     value: 3
+    minSpeed: 0
+    freezeAfter: 1
   - text: "Gira el tim\xF3n para dirigir el carro a los lados.\n(Teclado: A / D)"
     condition: 4
     value: 0.5
+    minSpeed: 0
+    freezeAfter: 1
   - text: 'Usa el acelerador para avanzar.
 
       (Teclado: W)'
     condition: 5
     value: 1
+    minSpeed: 2
+    freezeAfter: 1
   - text: "Usa el freno para detenerte. Si ya est\xE1s detenido, el freno te da reversa.\n(Teclado:
       S)"
     condition: 6
     value: 1
+    minSpeed: 0
+    freezeAfter: 1
   - text: "Cambia la vista de la c\xE1mara con el bot\xF3n CICLO.\n(Teclado: V)"
     condition: 7
     value: 3
+    minSpeed: 0
+    freezeAfter: 1
   finalMessage: "\xA1Ahora int\xE9ntalo! Atrapa la fruta que est\xE1 en el escenario."
+  praise: '!Bien!'
+  praiseColor: '#7CFC00'
+  praiseSeconds: 0.8
+  readSeconds: 1
 --- !u!4 &1516051613
 Transform:
   m_ObjectHideFlags: 0
@@ -10807,6 +10827,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 79834349840999225, guid: 130f189713b54bb47991e04ae88cbec7, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: c7e6d13680d6c6441b182e704491de35, type: 2}
+    - target: {fileID: 79834349840999225, guid: 130f189713b54bb47991e04ae88cbec7, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -1832498296281668231, guid: c7e6d13680d6c6441b182e704491de35, type: 2}
+    - target: {fileID: 79834349840999225, guid: 130f189713b54bb47991e04ae88cbec7, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 787006404244423720, guid: 130f189713b54bb47991e04ae88cbec7, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -40.00006

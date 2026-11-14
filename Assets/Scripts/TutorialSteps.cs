@@ -1,10 +1,15 @@
+using System.Collections;
 using UnityEngine;
 using TMPro;
 
-// Muestra los textos del tutorial uno por uno. Cada paso avanza SOLO cuando el jugador
-// hace lo que el texto pide: mirar, caminar, subirse al carro, girar, acelerar, frenar...
-// Lee los valores del FirstPersonPawn (a pie) y del VehiclePawn (en el carro), así que
-// funciona igual con teclado, control o volante de Arduino.
+/// <summary>
+/// Tutorial interactivo: el jugador PRUEBA cada control en vez de memorizarlo.
+///   1. Se muestra una instrucción y el jugador es libre de moverse.
+///   2. Cuando hace lo que se pide (caminar, acelerar, girar...), el juego se CONGELA un momento
+///      con una felicitación, el texto cambia a la siguiente instrucción y el juego continúa.
+/// Lee los valores del FirstPersonPawn (a pie) y del VehiclePawn (en el carro), así que funciona
+/// igual con teclado, control o volante de Arduino. No hay que presionar Enter para avanzar.
+/// </summary>
 public class TutorialSteps : MonoBehaviour
 {
     public enum Condition
@@ -24,8 +29,17 @@ public class TutorialSteps : MonoBehaviour
     {
         [TextArea(2, 4)] public string text;
         public Condition condition = Condition.Wait;
-        [Tooltip("Wait/Steer/Throttle/Brake: segundos. Walk: metros. Look: grados. Los demás lo ignoran.")]
+
+        [Tooltip("Wait: segundos que se muestra. Steer/Throttle/Brake: segundos que debe mantener la acción. " +
+                 "Walk: metros. Look: grados. Los demás lo ignoran.")]
         public float value = 3f;
+
+        [Tooltip("Steer/Throttle/Brake: el carro debe ir al menos a esta velocidad (m/s) para que cuente. " +
+                 "El timón solo gira el carro si se mueve, así que en Steer conviene 2.")]
+        public float minSpeed = 0f;
+
+        [Tooltip("Al lograrlo, el juego se congela un momento con una felicitación y pasa al siguiente texto.")]
+        public bool freezeAfter = true;
     }
 
     [Tooltip("Si se deja vacío, lo busca solo.")]
@@ -37,18 +51,28 @@ public class TutorialSteps : MonoBehaviour
     [SerializeField]
     private Step[] steps =
     {
-        new Step { text = "¡Bienvenido! Unas frutas se escaparon y debes atraparlas con el carro.", condition = Condition.Wait, value = 4f },
+        new Step { text = "¡Bienvenido! Unas frutas se escaparon y debes atraparlas con el carro.\nPrimero vas a practicar cada control.", condition = Condition.Wait, value = 4f, freezeAfter = false },
         new Step { text = "Mueve el mouse para mirar a tu alrededor.", condition = Condition.Look, value = 45f },
         new Step { text = "Camina con W A S D.", condition = Condition.Walk, value = 2f },
         new Step { text = "Acércate al carro, míralo y presiona E para subirte.", condition = Condition.EnterCar },
-        new Step { text = "Gira el timón para dirigir el carro a los lados.\n(Teclado: A / D)", condition = Condition.Steer, value = 0.5f },
-        new Step { text = "Usa el acelerador para avanzar.\n(Teclado: W)", condition = Condition.Throttle, value = 1f },
-        new Step { text = "Usa el freno para detenerte. Si ya estás detenido, el freno te da reversa.\n(Teclado: S)", condition = Condition.Brake, value = 1f },
-        new Step { text = "Cambia la vista de la cámara con el botón CICLO.\n(Teclado: V)", condition = Condition.ChangeView }
+        new Step { text = "Acelera para avanzar.\n(Teclado: W  ·  Volante: palanca hacia adelante)", condition = Condition.Throttle, value = 1f },
+        new Step { text = "Con el carro en movimiento, gira para dirigirlo.\n(Teclado: A / D  ·  Volante: gira el timón)", condition = Condition.Steer, value = 0.7f, minSpeed = 2f },
+        new Step { text = "Frena para detenerte. Si ya estás detenido, el freno te da reversa.\n(Teclado: S  ·  Volante: palanca hacia atrás)", condition = Condition.Brake, value = 0.8f },
+        new Step { text = "Cambia la vista de la cámara.\n(Teclado: V  ·  Volante: botón CICLO)", condition = Condition.ChangeView }
     };
 
     [TextArea(2, 4)]
-    [SerializeField] private string finalMessage = "¡Ahora inténtalo! Atrapa la fruta que está en el escenario.";
+    [SerializeField] private string finalMessage = "¡Listo! Ahora atrapa la fruta que está en el escenario.";
+
+    [Header("Pausa entre pasos")]
+    [SerializeField] private string praise = "¡Muy bien!";
+    [SerializeField] private string praiseColor = "#7CFC00";
+
+    [Tooltip("Segundos que el juego queda congelado mostrando la felicitación.")]
+    [SerializeField] private float praiseSeconds = 0.8f;
+
+    [Tooltip("Segundos que sigue congelado mostrando la siguiente instrucción, para leerla antes de continuar.")]
+    [SerializeField] private float readSeconds = 1f;
 
     private int index;
     private float progress;
@@ -56,12 +80,20 @@ public class TutorialSteps : MonoBehaviour
     private Vector3 playerStartPos;
     private float playerStartYaw;
     private bool finished;
+    private bool busy;      // mientras dura la pausa entre pasos
+    private bool frozen;
 
     void Start()
     {
         FindReferences();
         if (steps.Length == 0) { Finish(); return; }
         ShowStep();
+    }
+
+    void OnDisable()
+    {
+        // Si se cambia de escena en plena pausa, que la siguiente no arranque congelada.
+        if (frozen) Time.timeScale = 1f;
     }
 
     void FindReferences()
@@ -72,7 +104,7 @@ public class TutorialSteps : MonoBehaviour
 
     void Update()
     {
-        if (finished) return;
+        if (finished || busy) return;
 
         // Si ya atrapó la fruta, no pisar el mensaje de victoria del LevelManager.
         if (LevelManager.Instance != null && LevelManager.Instance.IsComplete) { finished = true; return; }
@@ -108,15 +140,18 @@ public class TutorialSteps : MonoBehaviour
                 break;
 
             case Condition.Steer:
-                done = vehicle != null && Hold(Mathf.Abs(vehicle.steer) > 0.5f, step.value);
+                done = vehicle != null &&
+                       Hold(Mathf.Abs(vehicle.steer) > 0.5f && Mathf.Abs(vehicle.Speed) >= step.minSpeed, step.value);
                 break;
 
             case Condition.Throttle:
-                done = vehicle != null && Hold(vehicle.throttle > 0.5f, step.value);
+                done = vehicle != null &&
+                       Hold(vehicle.throttle > 0.5f && Mathf.Abs(vehicle.Speed) >= step.minSpeed, step.value);
                 break;
 
             case Condition.Brake:
-                done = vehicle != null && Hold(vehicle.brake > 0.5f, step.value);
+                done = vehicle != null &&
+                       Hold(vehicle.brake > 0.5f && Mathf.Abs(vehicle.Speed) >= step.minSpeed, step.value);
                 break;
 
             case Condition.ChangeView:
@@ -126,16 +161,56 @@ public class TutorialSteps : MonoBehaviour
 
         if (!done) return;
 
-        index++;
-        if (index >= steps.Length) Finish();
-        else ShowStep();
+        if (step.freezeAfter) StartCoroutine(FreezeAndAdvance());
+        else Advance();
     }
 
-    // Suma tiempo mientras la condición se cumple.
+    // Suma tiempo mientras la condición se cumple (con el juego pausado, Time.deltaTime vale 0).
     private bool Hold(bool active, float seconds)
     {
         if (active) progress += Time.deltaTime;
         return progress >= seconds;
+    }
+
+    /// <summary>
+    /// Congela el juego, felicita, cambia al siguiente texto, deja un momento para leerlo y continúa.
+    /// Usa tiempo real (WaitForSecondsRealtime) porque con Time.timeScale = 0 el tiempo normal no avanza.
+    /// </summary>
+    private IEnumerator FreezeAndAdvance()
+    {
+        busy = true;
+        Freeze(true);
+
+        if (stepText != null) stepText.text = $"<color={praiseColor}>{praise}</color>";
+        yield return new WaitForSecondsRealtime(praiseSeconds);
+
+        Advance(); // pone el texto de la siguiente función
+        yield return new WaitForSecondsRealtime(readSeconds);
+
+        Freeze(false);
+        busy = false;
+    }
+
+    private void Freeze(bool on)
+    {
+        frozen = on;
+        if (on)
+        {
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            // Si el jugador abrió el menú de pausa en ese momento, no lo descongeles por él.
+            PauseMenu menu = FindAnyObjectByType<PauseMenu>();
+            if (menu == null || !menu.IsOpen) Time.timeScale = 1f;
+        }
+    }
+
+    private void Advance()
+    {
+        index++;
+        if (index >= steps.Length) Finish();
+        else ShowStep();
     }
 
     private void ShowStep()
