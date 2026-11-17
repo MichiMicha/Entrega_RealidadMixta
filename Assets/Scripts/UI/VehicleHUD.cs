@@ -32,9 +32,10 @@ public class VehicleHUD : MonoBehaviour
         SetBar(throttleFill, vehicle.throttle - vehicle.brake, true); // arriba acelera, abajo frena
         SetBar(steerFill, vehicle.steer, false);
 
+        // Muestra lo que el jugador está usando ahora: teclado, mando (con su marca) o Arduino.
         ArduinoSerial arduino = ArduinoSerial.Instance;
-        if (arduino != null && arduino.IsConnected) inputText.text = $"ARDUINO  {arduino.ConnectedPort}";
-        else inputText.text = InputHint.UsingGamepad ? "CONTROL" : "TECLADO";
+        if (InputScheme.Current == ControlScheme.Arduino) inputText.text = arduino != null && arduino.IsConnected ? $"ARDUINO  {arduino.ConnectedPort}" : "ARDUINO";
+        else inputText.text = ControlText.DeviceName().ToUpperInvariant();
 
         if (vehicle.views.Length > 0) viewText.text = vehicle.views[vehicle.CurrentView].name;
     }

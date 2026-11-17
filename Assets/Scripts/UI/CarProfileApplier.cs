@@ -6,6 +6,15 @@ using UnityEngine;
 /// Al cargar la escena aplica el carro guardado en CarSelection (así 3_Juego usa el elegido en el tutorial).
 /// Los números se pueden ajustar en el Inspector; "Reset" del componente los devuelve a los de fábrica.
 /// Pensado para el modo "classicDriving" del VehiclePawn (el que viene activo).
+///
+/// DERRAPE: cada carro guarda su propio derrape en su perfil. El VehiclePawn NO se configura a mano,
+/// porque este script lo reescribe al cargar la escena y cada vez que se elige un carro.
+///   - Derrape básico (siempre se aplica): normalGrip, tireFriction, slideFriction, driftSpeedKmh, driftRearGrip, frontDriveShare.
+///   - Derrape avanzado (llantas, transferencia de carga, contravolante...): se aplica si el perfil tiene
+///     "Advanced Drift" marcado; si no, se dejan los valores que tenga el VehiclePawn.
+///   - Para llevar lo que ya tienes en el VehiclePawn a un perfil: clic derecho en este componente →
+///     "Guardar derrape del VehiclePawn en perfil N".
+///   - En Play Mode, cambiar un valor del perfil en el Inspector se aplica al instante.
 /// </summary>
 [RequireComponent(typeof(VehiclePawn))]
 public class CarProfileApplier : MonoBehaviour
@@ -49,6 +58,39 @@ public class CarProfileApplier : MonoBehaviour
         [Tooltip("0 = tracción trasera (derrapa más), 0.5 = 4x4 (estable), 1 = delantera.")]
         [Range(0f, 1f)] public float frontDriveShare = 0f;
 
+        [Header("Derrape avanzado (llantas del VehiclePawn)")]
+        [Tooltip("Marcado: este carro aplica TODOS los valores de abajo al VehiclePawn. " +
+                 "Desmarcado: se dejan los que tenga el VehiclePawn.")]
+        public bool advancedDrift = false;
+        [Tooltip("Rango (km/h) por debajo de 'Drift Speed Kmh' en el que la pérdida de agarre entra poco a poco.")]
+        public float driftRampKmh = 9f;
+        [Tooltip("Rigidez de curva de las llantas (1/rad). Más alto = el agarre llega con menos ángulo y el pico es más brusco.")]
+        public float corneringStiffness = 20f;
+        [Tooltip("Cuánto baja el agarre al cargar mucho una llanta. Más alto = pierde agarre más fácil en curva.")]
+        [Range(0f, 0.4f)] public float loadSensitivity = 0.15f;
+        [Tooltip("Más alta = el eje delantero pierde agarre primero (subviraje); más baja = el trasero (sobreviraje).")]
+        [Range(0.2f, 0.8f)] public float rollStiffnessFront = 0.55f;
+        [Tooltip("Más alto = el carro tarda más en rotar y en dejar de rotar.")]
+        [Range(0.3f, 0.8f)] public float yawGyrationRatio = 0.5f;
+        [Tooltip("Fracción del peso sobre el eje delantero.")]
+        [Range(0.3f, 0.7f)] public float frontWeightFraction = 0.5f;
+        [Tooltip("Ancho de vía (m). Más angosto = más transferencia de peso en curva.")]
+        public float trackWidth = 1.6f;
+        [Tooltip("Máximo uso del agarre por frenar/acelerar. Menos de 1 deja algo de agarre lateral al frenar a fondo.")]
+        [Range(0.5f, 1f)] public float absMaxUsage = 0.95f;
+        [Tooltip("Segundos que tarda el peso en pasar de un lado a otro.")]
+        public float loadTransferTime = 0.08f;
+        [Tooltip("Velocidad (m/s) por debajo de la cual se usa la conducción simple.")]
+        public float dynamicsBlendStart = 2.5f;
+        [Tooltip("Velocidad (m/s) por encima de la cual manda el modelo de llantas al 100 %.")]
+        public float dynamicsBlendEnd = 6f;
+        [Tooltip("Ángulo de deslizamiento (grados) donde empieza a recuperarse el giro para contravolantear.")]
+        public float counterSteerStart = 5f;
+        [Tooltip("Ángulo (grados) donde las llantas ya tienen su giro máximo disponible.")]
+        public float counterSteerFull = 15f;
+        [Tooltip("Cuánto de la fuerza del motor le quita agarre lateral al eje trasero (0 = nada, 1 = todo).")]
+        [Range(0f, 1f)] public float classicDriveGripUse = 0.9f;
+
         [Header("Chasis")]
         public float mass = 1200f;
         [Tooltip("Más bajo = más estable en curvas. Más alto = se balancea más.")]
@@ -59,6 +101,12 @@ public class CarProfileApplier : MonoBehaviour
 
     [Tooltip("Si se deja vacío, usa el VehiclePawn de este mismo objeto.")]
     [SerializeField] private VehiclePawn vehicle;
+
+    [Tooltip("Apagado (recomendado cuando cada carro tiene su propio VehiclePawn): este componente NO escribe " +
+             "ningún valor al cargar la escena. Úsalo solo si quieres volver a un VehiclePawn compartido.")]
+    [SerializeField] private bool applyOnStart = false;
+
+    private int currentIndex;
 
     [Tooltip("Orden: 0 Carreras, 1 Común, 2 Achatado, 3 Minivan. Arrastra el modelo 3D de cada uno.")]
     public Profile[] profiles = DefaultProfiles();
@@ -74,7 +122,13 @@ public class CarProfileApplier : MonoBehaviour
     void Awake()
     {
         if (vehicle == null) vehicle = GetComponent<VehiclePawn>();
-        Apply(CarSelection.Index);
+        if (applyOnStart) Apply(CarSelection.Index);
+    }
+
+    // En Play Mode, al cambiar un valor del perfil en el Inspector se aplica al carro que se está viendo.
+    void OnValidate()
+    {
+        if (applyOnStart && Application.isPlaying && profiles != null && profiles.Length > 0) Apply(currentIndex);
     }
 
     /// <summary>Pone los números y el modelo del carro i.</summary>
@@ -83,6 +137,7 @@ public class CarProfileApplier : MonoBehaviour
         if (profiles == null || profiles.Length == 0) return;
         if (vehicle == null) vehicle = GetComponent<VehiclePawn>();
         i = Mathf.Clamp(i, 0, profiles.Length - 1);
+        currentIndex = i;
         Profile p = profiles[i];
 
         vehicle.classicDriving = true;
@@ -104,12 +159,77 @@ public class CarProfileApplier : MonoBehaviour
         vehicle.driftRearGrip = p.driftRearGrip;
         vehicle.frontDriveShare = p.frontDriveShare;
 
+        if (p.advancedDrift)
+        {
+            vehicle.driftRampKmh = p.driftRampKmh;
+            vehicle.corneringStiffness = p.corneringStiffness;
+            vehicle.loadSensitivity = p.loadSensitivity;
+            vehicle.rollStiffnessFront = p.rollStiffnessFront;
+            vehicle.yawGyrationRatio = p.yawGyrationRatio;
+            vehicle.frontWeightFraction = p.frontWeightFraction;
+            vehicle.trackWidth = p.trackWidth;
+            vehicle.absMaxUsage = p.absMaxUsage;
+            vehicle.loadTransferTime = p.loadTransferTime;
+            vehicle.dynamicsBlendStart = p.dynamicsBlendStart;
+            vehicle.dynamicsBlendEnd = p.dynamicsBlendEnd;
+            vehicle.counterSteerStart = p.counterSteerStart;
+            vehicle.counterSteerFull = p.counterSteerFull;
+            vehicle.classicDriveGripUse = p.classicDriveGripUse;
+        }
+
         vehicle.mass = p.mass;
         vehicle.centerOfMassHeight = p.centerOfMassHeight;
         vehicle.suspensionFrequency = p.suspensionFrequency;
 
         for (int j = 0; j < profiles.Length; j++)
             if (profiles[j].model != null) profiles[j].model.SetActive(j == i);
+    }
+
+    // ---------- Llevar el derrape del VehiclePawn a un perfil ----------
+
+    [ContextMenu("Guardar derrape del VehiclePawn en perfil 1")] void CaptureDrift0() => CaptureDrift(0);
+    [ContextMenu("Guardar derrape del VehiclePawn en perfil 2")] void CaptureDrift1() => CaptureDrift(1);
+    [ContextMenu("Guardar derrape del VehiclePawn en perfil 3")] void CaptureDrift2() => CaptureDrift(2);
+    [ContextMenu("Guardar derrape del VehiclePawn en perfil 4")] void CaptureDrift3() => CaptureDrift(3);
+
+    /// <summary>Copia el derrape que tiene ahora el VehiclePawn al perfil i y marca "Advanced Drift".</summary>
+    void CaptureDrift(int i)
+    {
+        if (vehicle == null) vehicle = GetComponent<VehiclePawn>();
+        if (vehicle == null || profiles == null || i < 0 || i >= profiles.Length)
+        {
+            Debug.LogWarning($"[CarProfileApplier] No hay perfil {i + 1} o falta el VehiclePawn.", this);
+            return;
+        }
+        Profile p = profiles[i];
+
+        p.normalGrip = vehicle.normalGrip;
+        p.tireFriction = vehicle.tireFriction;
+        p.slideFriction = vehicle.slideFriction;
+        p.driftSpeedKmh = vehicle.driftSpeedKmh;
+        p.driftRearGrip = vehicle.driftRearGrip;
+        p.frontDriveShare = vehicle.frontDriveShare;
+
+        p.advancedDrift = true;
+        p.driftRampKmh = vehicle.driftRampKmh;
+        p.corneringStiffness = vehicle.corneringStiffness;
+        p.loadSensitivity = vehicle.loadSensitivity;
+        p.rollStiffnessFront = vehicle.rollStiffnessFront;
+        p.yawGyrationRatio = vehicle.yawGyrationRatio;
+        p.frontWeightFraction = vehicle.frontWeightFraction;
+        p.trackWidth = vehicle.trackWidth;
+        p.absMaxUsage = vehicle.absMaxUsage;
+        p.loadTransferTime = vehicle.loadTransferTime;
+        p.dynamicsBlendStart = vehicle.dynamicsBlendStart;
+        p.dynamicsBlendEnd = vehicle.dynamicsBlendEnd;
+        p.counterSteerStart = vehicle.counterSteerStart;
+        p.counterSteerFull = vehicle.counterSteerFull;
+        p.classicDriveGripUse = vehicle.classicDriveGripUse;
+
+#if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this);
+#endif
+        Debug.Log($"[CarProfileApplier] Derrape del VehiclePawn guardado en el perfil {i + 1} ({p.name}).", this);
     }
 
     static Profile[] DefaultProfiles()

@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8623275469369614885}
-  - component: {fileID: 8689999423634325702}
   m_Layer: 0
   m_Name: CarSelector
   m_TagString: Untagged
@@ -32,21 +31,3 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8689999423634325702
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6227296230840389818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff533abd04dd7f547a82e2f05a4aa0de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CarSelector
-  applier: {fileID: 0}
-  panel: {fileID: 0}
-  infoText: {fileID: 0}
-  pressAt: 0.6
-  releaseAt: 0.3
-  swapPedals: 0

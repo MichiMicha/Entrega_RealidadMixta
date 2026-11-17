@@ -55,6 +55,10 @@ public class PlayerController : MonoBehaviour
     {
         if (pawn == null) return;
 
+        // Con el volante Arduino en uso, él manda (ver ArduinoController). Teclado y mando vuelven a
+        // mandar apenas el jugador los toca (ver InputScheme).
+        if (InputScheme.Current == ControlScheme.Arduino && ArduinoSerial.Instance != null && ArduinoSerial.Instance.IsConnected) return;
+
         // Valores continuos: se leen en cada frame.
         pawn.Move(input.Player.Move.ReadValue<Vector2>());
         // El mouse da los píxeles movidos en ESTE frame; el stick da -1..1 (una velocidad),

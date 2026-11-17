@@ -31,7 +31,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2795896399116709590}
+  m_Father: {fileID: 2079370371418538604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &849552201736407557
 MeshFilter:
@@ -214,9 +214,6 @@ Transform:
   m_LocalScale: {x: 5.27, y: 5.27, z: 5.27}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 3530682714051502171}
-  - {fileID: 2411169859342482043}
-  - {fileID: 6672380726437302681}
   - {fileID: 2795896399116709590}
   - {fileID: 1570428484550025846}
   - {fileID: 4425128365725603648}
@@ -289,7 +286,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 0.37, y: 0.23, z: 0.75}
   m_Center: {x: 0, y: 0.12, z: 0}
@@ -300,7 +297,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 679560086051541121}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 025ea80c47988624ebb786dffd9fc25a, type: 3}
   m_Name: 
@@ -413,6 +410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarProfileApplier
   vehicle: {fileID: 4387989368897923132}
+  applyOnStart: 0
   profiles:
   - name: Carreras
     description: "El m\xE1s veloz. Acelera como un rayo, pero es nervioso y derrapa:
@@ -436,6 +434,21 @@ MonoBehaviour:
     driftSpeedKmh: 70
     driftRearGrip: 0.5
     frontDriveShare: 0
+    advancedDrift: 0
+    driftRampKmh: 9
+    corneringStiffness: 20
+    loadSensitivity: 0.15
+    rollStiffnessFront: 0.55
+    yawGyrationRatio: 0.5
+    frontWeightFraction: 0.5
+    trackWidth: 1.6
+    absMaxUsage: 0.95
+    loadTransferTime: 0.08
+    dynamicsBlendStart: 2.5
+    dynamicsBlendEnd: 6
+    counterSteerStart: 5
+    counterSteerFull: 15
+    classicDriveGripUse: 0.9
     mass: 1000
     centerOfMassHeight: 0.4
     suspensionFrequency: 2.4
@@ -460,6 +473,21 @@ MonoBehaviour:
     driftSpeedKmh: 60
     driftRearGrip: 0.65
     frontDriveShare: 0
+    advancedDrift: 0
+    driftRampKmh: 9
+    corneringStiffness: 20
+    loadSensitivity: 0.15
+    rollStiffnessFront: 0.55
+    yawGyrationRatio: 0.5
+    frontWeightFraction: 0.5
+    trackWidth: 1.6
+    absMaxUsage: 0.95
+    loadTransferTime: 0.08
+    dynamicsBlendStart: 2.5
+    dynamicsBlendEnd: 6
+    counterSteerStart: 5
+    counterSteerFull: 15
+    classicDriveGripUse: 0.9
     mass: 1200
     centerOfMassHeight: 0.5
     suspensionFrequency: 1.8
@@ -485,6 +513,21 @@ MonoBehaviour:
     driftSpeedKmh: 75
     driftRearGrip: 0.9
     frontDriveShare: 0.5
+    advancedDrift: 0
+    driftRampKmh: 9
+    corneringStiffness: 20
+    loadSensitivity: 0.15
+    rollStiffnessFront: 0.55
+    yawGyrationRatio: 0.5
+    frontWeightFraction: 0.5
+    trackWidth: 1.6
+    absMaxUsage: 0.95
+    loadTransferTime: 0.08
+    dynamicsBlendStart: 2.5
+    dynamicsBlendEnd: 6
+    counterSteerStart: 5
+    counterSteerFull: 15
+    classicDriveGripUse: 0.9
     mass: 1100
     centerOfMassHeight: 0.3
     suspensionFrequency: 2.2
@@ -510,6 +553,21 @@ MonoBehaviour:
     driftSpeedKmh: 90
     driftRearGrip: 1
     frontDriveShare: 1
+    advancedDrift: 0
+    driftRampKmh: 9
+    corneringStiffness: 20
+    loadSensitivity: 0.15
+    rollStiffnessFront: 0.55
+    yawGyrationRatio: 0.5
+    frontWeightFraction: 0.5
+    trackWidth: 1.6
+    absMaxUsage: 0.95
+    loadTransferTime: 0.08
+    dynamicsBlendStart: 2.5
+    dynamicsBlendEnd: 6
+    counterSteerStart: 5
+    counterSteerFull: 15
+    classicDriveGripUse: 0.9
     mass: 1800
     centerOfMassHeight: 0.75
     suspensionFrequency: 1.4
@@ -544,7 +602,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2795896399116709590}
+  m_Father: {fileID: 2079370371418538604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &807086367300797704
 MeshFilter:
@@ -1121,11 +1179,11 @@ Transform:
   m_GameObject: {fileID: 1410946535660276873}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.002600001, z: 0}
+  m_LocalPosition: {x: 0, y: -0.0026000044, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2795896399116709590}
+  m_Father: {fileID: 2079370371418538604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7805946445200895720
 MeshFilter:
@@ -1209,11 +1267,11 @@ Transform:
   m_GameObject: {fileID: 1411526548315090348}
   serializedVersion: 2
   m_LocalRotation: {x: 0.00000014106499, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0587, y: 0.1973, z: -0.0292}
-  m_LocalScale: {x: 0.33485958, y: 0.33485958, z: 0.33485958}
+  m_LocalPosition: {x: -0.058699526, y: 0.19730003, z: -0.029200345}
+  m_LocalScale: {x: 0.3348596, y: 0.3348596, z: 0.3348596}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 487521268442664306}
+  m_Father: {fileID: 2079370371418538604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1540550530368897524
 GameObject:
@@ -1730,13 +1788,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4736963447109310039}
-  - {fileID: 8665504859926778604}
-  - {fileID: 2800291746056146421}
-  - {fileID: 1335395708400068357}
-  - {fileID: 1360487256125676725}
-  - {fileID: 6442471891538478500}
-  - {fileID: 130330833527742878}
+  - {fileID: 2079370371418538604}
   m_Father: {fileID: 487521268442664306}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2815528945645442738
@@ -1934,13 +1986,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2956172733884156281}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25881922, y: -0, z: -0, w: 0.9659258}
-  m_LocalPosition: {x: -0.05695946, y: 0.16019209, z: 0.08077919}
+  m_LocalRotation: {x: 0.25881925, y: -0, z: 0.000000014901163, w: 0.9659258}
+  m_LocalPosition: {x: -0.056959063, y: 0.16019209, z: 0.08077958}
   m_LocalScale: {x: 0.33485964, y: 0.33485958, z: 0.3348596}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3493802168334556288}
-  m_Father: {fileID: 487521268442664306}
+  m_Father: {fileID: 2079370371418538604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3256433224903491837
 GameObject:
@@ -2063,7 +2115,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2795896399116709590}
+  m_Father: {fileID: 2079370371418538604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4034563227531044657
 MeshFilter:
@@ -2228,7 +2280,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2795896399116709590}
+  m_Father: {fileID: 2079370371418538604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6904759719576556914
 MeshFilter:
@@ -2659,7 +2711,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2795896399116709590}
+  m_Father: {fileID: 2079370371418538604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2818600098576445169
 MeshFilter:
@@ -3069,6 +3121,222 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 0.5
+--- !u!1 &8628518836339846574
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2079370371418538604}
+  - component: {fileID: 8006537202455272664}
+  - component: {fileID: 8622806332452609906}
+  - component: {fileID: 5469273114845620235}
+  - component: {fileID: 6166461639106434577}
+  m_Layer: 0
+  m_Name: Car-2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2079370371418538604
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8628518836339846574}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4736963447109310039}
+  - {fileID: 8665504859926778604}
+  - {fileID: 2800291746056146421}
+  - {fileID: 1335395708400068357}
+  - {fileID: 1360487256125676725}
+  - {fileID: 6442471891538478500}
+  - {fileID: 130330833527742878}
+  - {fileID: 3530682714051502171}
+  - {fileID: 2411169859342482043}
+  - {fileID: 6672380726437302681}
+  m_Father: {fileID: 2795896399116709590}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &8006537202455272664
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8628518836339846574}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &8622806332452609906
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8628518836339846574}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.38, y: 0.23, z: 0.74}
+  m_Center: {x: 0, y: 0.12, z: 0}
+--- !u!114 &5469273114845620235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8628518836339846574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 025ea80c47988624ebb786dffd9fc25a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehiclePawn
+  pawnCamera: {fileID: 0}
+  mass: 1200
+  engineForce: 6000
+  brakeForce: 9000
+  wheelBase: 2.5
+  maxSteerAngle: 30
+  airDragCoefficient: 8
+  rollingResistance: 0.05
+  tireFriction: 1.3
+  gripStiffness: 6
+  slideFriction: 0.8
+  steerFalloffSpeed: 12
+  frontWeightFraction: 0.5
+  trackWidth: 1.6
+  corneringStiffness: 20
+  loadSensitivity: 0.15
+  rollStiffnessFront: 0.55
+  yawGyrationRatio: 0.5
+  frontDriveShare: 0
+  absMaxUsage: 0.95
+  loadTransferTime: 0.08
+  dynamicsBlendStart: 2.5
+  dynamicsBlendEnd: 6
+  counterSteerStart: 5
+  counterSteerFull: 15
+  driftSpeedKmh: 60
+  driftRampKmh: 9
+  driftRearGrip: 0.65
+  suspensionLength: 0.5
+  suspensionFrequency: 1.8
+  suspensionDamping: 0.9
+  reboundDamping: 1.2
+  bumpStop: 0.08
+  maxGroundAngle: 50
+  centerOfMassHeight: 0.5
+  airAngularDamping: 0.3
+  maxPitch: 40
+  maxRoll: 30
+  landingMinImpact: 1.5
+  landingMinAirTime: 0.1
+  parkMaxAngle: 25
+  parkSpeed: 0.3
+  collisionRestitution: 0.25
+  collisionFriction: 0.2
+  classicDriving: 1
+  engineAcceleration: 8
+  throttleRise: 2.5
+  throttleFall: 3
+  brakeDeceleration: 14
+  reverseAcceleration: 4
+  maxReverseSpeed: 5
+  classicRolling: 1.2
+  classicAirDrag: 0.02
+  classicDownforce: 0.1
+  classicParkingSpeed: 1
+  maxSteeringRate: 70
+  steeringSmoothing: 6
+  highSpeedSteerReduction: 0.25
+  steerDeadZone: 0.05
+  normalGrip: 8
+  classicDriveGripUse: 0.9
+  cabinFrequency: 2.2
+  cabinDamping: 0.2
+  cabinBounceStrength: 0.3
+  cabinBounceMax: 0.15
+  pitchFromAccel: 0.3
+  rollFromLateral: 1.2
+  maxCabinPitch: 6
+  maxCabinRoll: 8
+  tiltSmoothing: 8
+  views: []
+  orbitView: {fileID: 0}
+  steeringWheel: {fileID: 0}
+  steeringWheelMaxAngle: 135
+  steeringWheelAxis: {x: 0, y: 0, z: 1}
+  steeringWheelSmoothing: 14
+  x: {x: 0, y: 0, z: 0}
+  v: {x: 0, y: 0, z: 0}
+  heading: 0
+  throttle: 0
+  brake: 0
+  steer: 0
+  sliding: 0
+  yawRate: 0
+  slipAngleFront: 0
+  slipAngleRear: 0
+  bodySlipAngle: 0
+  grounded: 0
+  impactSpeed: 0
+  pitchAngle: 0
+  rollAngle: 0
+  cabinOffset: 0
+  driftAmount: 0
+--- !u!114 &6166461639106434577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8628518836339846574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b1e0c5a9d3f4e2c8a6d5f4b3c2e1a09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarInfo
+  carName: Carreras
+  description: "El m\xE1s veloz. Acelera como un rayo, pero es nervioso y derrapa:
+    exige manos firmes."
+  speedStars: 5
+  accelerationStars: 5
+  controlStars: 2
 --- !u!1 &8837012901681801706
 GameObject:
   m_ObjectHideFlags: 0
@@ -3100,7 +3368,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2795896399116709590}
+  m_Father: {fileID: 2079370371418538604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6617629223039102686
 MeshFilter:
@@ -3412,13 +3680,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9181007211425204454}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.19080912, y: -0, z: -0, w: 0.98162717}
-  m_LocalPosition: {x: 0.0016407905, y: 0.8554599, z: -1.5506196}
-  m_LocalScale: {x: 0.33485964, y: 0.3348596, z: 0.33485967}
+  m_LocalRotation: {x: 0.19080912, y: 0.000000029802322, z: 0.000000007450581, w: 0.98162717}
+  m_LocalPosition: {x: 0.0016407007, y: 0.85546, z: -1.5506197}
+  m_LocalScale: {x: 0.33485967, y: 0.3348596, z: 0.3348597}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7097614814993336903}
-  m_Father: {fileID: 487521268442664306}
+  m_Father: {fileID: 2079370371418538604}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &3555113646252167856
 PrefabInstance:

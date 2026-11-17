@@ -4,18 +4,18 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
 /// <summary>
-/// Muestra la tecla o el botón de una acción: "E" con teclado, "Y" con control.
-/// Cambia solo según lo último que se presionó.
+/// Muestra la tecla o el botón de una acción: "E" con teclado, "Y" / "Triángulo" con mando (según la marca),
+/// o el texto de Arduino. Cambia solo según el dispositivo que se esté usando (ver InputScheme).
 /// USO: ponerlo en un texto y arrastrar la acción (ej: Player/Interact) desde InputSystem_Actions.
 /// </summary>
 [RequireComponent(typeof(TMP_Text))]
 public class InputHint : MonoBehaviour
 {
-    /// <summary>True si lo último que se presionó fue un botón del control.</summary>
-    public static bool UsingGamepad { get; private set; }
+    /// <summary>True si se está usando un mando.</summary>
+    public static bool UsingGamepad => InputScheme.Current == ControlScheme.Gamepad;
 
-    /// <summary>True si lo último que se presionó fue un botón del Arduino (lo pone ArduinoController).</summary>
-    public static bool UsingArduino;
+    /// <summary>True si se está usando el Arduino.</summary>
+    public static bool UsingArduino => InputScheme.Current == ControlScheme.Arduino;
 
     [Tooltip("La acción, arrastrada desde Assets/InputSystem_Actions (despliega la flecha del archivo).")]
     public InputActionReference action;
@@ -28,16 +28,6 @@ public class InputHint : MonoBehaviour
 
     private TMP_Text text;
 
-    [RuntimeInitializeOnLoadMethod]
-    static void ListenForDevice()
-    {
-        InputSystem.onAnyButtonPress.Call(control =>
-        {
-            UsingGamepad = control.device is Gamepad;
-            UsingArduino = false;
-        });
-    }
-
     void Awake()
     {
         text = GetComponent<TMP_Text>();
@@ -45,19 +35,30 @@ public class InputHint : MonoBehaviour
 
     void Update()
     {
-        string group = UsingGamepad ? "Gamepad" : "Keyboard&Mouse";
-        string key = UsingArduino && arduinoKey != "" ? arduinoKey : KeyName(action.action, group);
-        text.text = string.Format(format, key);
+        string key;
+        if (UsingArduino && arduinoKey != "") key = arduinoKey;
+        else if (action == null || action.action == null) key = null; // sin acción asignada: no hay nada que mostrar
+        else key = KeyName(action.action, UsingGamepad ? "Gamepad" : "Keyboard&Mouse");
+
+        text.text = key == null ? "" : string.Format(format, key);
     }
 
-    /// <summary>Nombre corto del primer botón de la acción en ese grupo ("E", "Y", "Start", "RB").</summary>
+    /// <summary>Nombre corto del primer botón de la acción en ese grupo ("E", "Y", "Triángulo", "Start", "RB").</summary>
     static string KeyName(InputAction action, string group)
     {
         for (int i = 0; i < action.bindings.Count; i++)
         {
             InputBinding binding = action.bindings[i];
-            if (!binding.isComposite && !binding.isPartOfComposite && binding.groups.Contains(group))
-                return action.GetBindingDisplayString(i);
+            if (binding.isComposite || binding.isPartOfComposite || !binding.groups.Contains(group)) continue;
+
+            // En el mando, usar el nombre según la marca (Xbox, PlayStation...).
+            const string padPrefix = "<Gamepad>/";
+            if (group == "Gamepad" && binding.path.StartsWith(padPrefix))
+            {
+                string padName = ControlText.PadControl(binding.path.Substring(padPrefix.Length));
+                if (padName != null) return padName;
+            }
+            return action.GetBindingDisplayString(i);
         }
         return "?";
     }
