@@ -6,7 +6,7 @@ using TMPro;
 ///   - Empieza a correr cuando el jugador SE SUBE AL CARRO (o desde que carga la escena, si se desmarca
 ///     "Start When In Car").
 ///   - Se detiene en pausa: el menú de pausa pone Time.timeScale = 0, y aquí se suma Time.deltaTime,
-///     que vale 0 mientras está pausado. (También se detiene con la pausa de la simulación, tecla P.)
+///     que vale 0 mientras está pausado.
 ///   - Termina cuando el LevelManager dice que se atraparon todas las frutas, y guarda el tiempo
 ///     en el ranking (ScoreBoard) para mostrarlo en la última escena.
 /// </summary>
@@ -60,18 +60,30 @@ public class GameTimer : MonoBehaviour
         // Todavía no arranca: espera a que el jugador se suba al carro.
         if (!IsRunning)
         {
-            if (vehicle == null) vehicle = FindAnyObjectByType<VehiclePawn>();
-            // Pawn.Controller es null mientras nadie maneja el carro.
-            if (vehicle != null && vehicle.Controller != null) IsRunning = true;
+            // Se busca el VehiclePawn que SÍ está siendo conducido (el prefab del carro trae un duplicado apagado,
+            // y tomar "el primero que aparezca" podía agarrar ese y el cronómetro nunca arrancaba).
+            VehiclePawn driven = FindDrivenVehicle();
+            if (driven != null)
+            {
+                vehicle = driven;
+                IsRunning = true;
+            }
             else return;
         }
 
         // En pausa no corre.
         if (Time.timeScale <= 0f) return;
-        if (Simulate.Instance != null && Simulate.Instance.paused) return;
 
         Elapsed += Time.deltaTime;
         UpdateText();
+    }
+
+    // Devuelve el VehiclePawn que tiene un controlador (el que se está conduciendo), o null si ninguno.
+    private static VehiclePawn FindDrivenVehicle()
+    {
+        foreach (VehiclePawn v in FindObjectsByType<VehiclePawn>(FindObjectsSortMode.None))
+            if (v.Controller != null) return v;
+        return null;
     }
 
     public void StartTimer() => IsRunning = true;

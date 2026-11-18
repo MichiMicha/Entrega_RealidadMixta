@@ -909,6 +909,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cecabd5b91b52b429e76e7dea5c123b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FirstPersonPawn
+--- !u!4 &65766681 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3530682714051502171, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+  m_PrefabInstance: {fileID: 1633809656}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &67959681
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13182,6 +13187,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1279437348525638701, guid: e2e682b966e3f644392ffbfab511e0e2, type: 3}
   m_PrefabInstance: {fileID: 775958943}
   m_PrefabAsset: {fileID: 0}
+--- !u!20 &783289076 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 7169162570853869764, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+  m_PrefabInstance: {fileID: 1633809656}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &785314589
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23661,6 +23671,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4661435515762813124, guid: e289bf5debb17f6459818c207d781953, type: 3}
   m_PrefabInstance: {fileID: 1322715784}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1324521831 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2411169859342482043, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+  m_PrefabInstance: {fileID: 1633809656}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1324823998
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27437,6 +27452,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7499966408349325154, guid: 484e95a1def424c4b9f1ad821e0c226a, type: 3}
   m_PrefabInstance: {fileID: 1507415884}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1511277849 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6672380726437302681, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+  m_PrefabInstance: {fileID: 1633809656}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1512168207
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29162,8 +29182,35 @@ PrefabInstance:
       propertyPath: m_Name
       value: Car-2 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5469273114845620235, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+      propertyPath: orbitView
+      value: 
+      objectReference: {fileID: 1324521831}
+    - target: {fileID: 5469273114845620235, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+      propertyPath: pawnCamera
+      value: 
+      objectReference: {fileID: 783289076}
+    - target: {fileID: 5469273114845620235, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+      propertyPath: steeringWheel
+      value: 
+      objectReference: {fileID: 1511277849}
+    - target: {fileID: 5469273114845620235, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+      propertyPath: views.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5469273114845620235, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+      propertyPath: 'views.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1324521831}
+    - target: {fileID: 5469273114845620235, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+      propertyPath: 'views.Array.data[1]'
+      value: 
+      objectReference: {fileID: 65766681}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1727507775741743539, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+    - {fileID: 953441589421869646, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
+    - {fileID: 822817105213348420, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 331036ff827ed6f4fbc42e4abaca6f2a, type: 3}

@@ -60,12 +60,35 @@ public class FirstPersonPawn : Pawn
         target = FindInteractable();
     }
 
-    /// <summary>Lanza un rayo desde el centro de la cámara y busca un IInteractable.</summary>
+    /// <summary>
+    /// Lanza un rayo desde el centro de la cámara y busca un IInteractable USABLE (activo y con el script encendido).
+    /// El prefab del carro trae un VehiclePawn duplicado y apagado en la raíz: si el rayo le pega a ese,
+    /// el jugador se subía a un "carro fantasma" que no se movía. Aquí se ignoran los apagados y se usa el activo.
+    /// </summary>
     IInteractable FindInteractable()
     {
         Ray ray = new Ray(pawnCamera.transform.position, pawnCamera.transform.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, interactRange))
-            return hit.collider.GetComponentInParent<IInteractable>();
+        if (!Physics.Raycast(ray, out RaycastHit hit, interactRange)) return null;
+
+        bool sawDisabled = false;
+        foreach (IInteractable candidate in hit.collider.GetComponentsInParent<IInteractable>())
+        {
+            if (IsUsable(candidate)) return candidate;
+            sawDisabled = true;
+        }
+
+        // Le pegó a la carrocería de un carro cuyo VehiclePawn de ese nivel está apagado:
+        // busca el activo dentro del mismo carro.
+        if (sawDisabled)
+        {
+            foreach (IInteractable candidate in hit.collider.transform.root.GetComponentsInChildren<IInteractable>())
+                if (IsUsable(candidate)) return candidate;
+        }
         return null;
+    }
+
+    static bool IsUsable(IInteractable candidate)
+    {
+        return !(candidate is Behaviour behaviour) || behaviour.isActiveAndEnabled;
     }
 }

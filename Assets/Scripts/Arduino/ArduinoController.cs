@@ -162,8 +162,7 @@ public class ArduinoController : MonoBehaviour
         {
             cycleDownTime = Time.unscaledTime;
             holdDone = false;
-            // Si con este toque se está eligiendo carro, no debe además "interactuar" al soltarlo.
-            suppressCycle = CarSelector.IsChoosing && !MenuIsOpen;
+          
         }
         if (cycle && !holdDone && Time.unscaledTime - cycleDownTime >= holdToSelect)
         {

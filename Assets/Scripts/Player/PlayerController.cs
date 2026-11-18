@@ -24,9 +24,11 @@ public class PlayerController : MonoBehaviour
         input.Player.Interact.performed += _ => pawn?.Interact();
         input.Player.Next.performed += _ => pawn?.ChangeView(); // V o 2
 
-        input.Simulation.Pause.performed += _ => Simulate.Instance.TogglePause();
-        input.Simulation.Step.performed += _ => Simulate.Instance.Step();
-        input.Simulation.Reset.performed += _ => Simulate.Instance.ResetSimulation();
+        // Pausa de la simulación (P / L1) y paso a paso (N / R1): QUITADOS a propósito.
+        // Congelaban el carro y el cronómetro sin avisar. La pausa normal es el menú (Esc / Start).
+        // input.Simulation.Pause.performed += _ => Simulate.Instance.TogglePause();
+        // input.Simulation.Step.performed += _ => Simulate.Instance.Step();
+        input.Simulation.Reset.performed += _ => Simulate.Instance.ResetSimulation(); // R / Select
     }
 
     void Start()

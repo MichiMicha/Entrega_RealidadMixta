@@ -51,11 +51,26 @@ public class Simulate : MonoBehaviour
         paused = !paused;
     }
 
-    /// <summary>Lleva t a 0 y todos los objetos a su estado inicial.</summary>
+    /// <summary>
+    /// Lleva t a 0 y todos los objetos a su estado inicial.
+    /// Si un objeto falla al reiniciarse, lo avisa en la Consola (en rojo, con su nombre)
+    /// y sigue con los demás, para que un solo fallo no impida reiniciar el carro.
+    /// </summary>
     public void ResetSimulation()
     {
         time = 0f;
-        foreach (ISimulable obj in objects) obj.ResetState();
+        foreach (ISimulable obj in objects)
+        {
+            if (obj is Object unityObj && unityObj == null) continue; // objeto destruido
+            try
+            {
+                obj.ResetState();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[Simulate] No se pudo reiniciar '{(obj as Object)?.name}': {e}", obj as Object);
+            }
+        }
     }
 
     /// <summary>Para objetos creados con Instantiate después de iniciar.</summary>
