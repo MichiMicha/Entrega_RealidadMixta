@@ -119,6 +119,18 @@ public class VehiclePawn : Pawn, ISimulable, IInteractable
              "En ambos, el derrape lo calculan las llantas (modelo de bicicleta dinámico).")]
     public bool classicDriving = true;
 
+    [Header("Pedales (acelerador y freno)")]
+    [Tooltip("Por debajo de este valor (0..1) un pedal cuenta como suelto. Filtra el ruido del potenciómetro " +
+             "y evita frenadas o aceleraciones fantasma con el pedal en reposo.")]
+    [Range(0f, 0.2f)] public float pedalDeadZone = 0.03f;
+    [Tooltip("Activo: si se pisa el freno, el acelerador se ignora (en un carro real el freno gana). " +
+             "Detenido y con la reversa activada, acelerar y frenar a la vez se compensan como antes. " +
+             "Apagado: acelerador y freno se restan.")]
+    public bool brakeOverridesThrottle = true;
+    [Tooltip("Activo: detenido, el pedal de freno da reversa. " +
+             "Apagado: detenido, el freno solo mantiene el carro quieto y no hay reversa.")]
+    public bool reverseWithBrake = true;
+
     [Header("Clásico: motor y frenos (aceleraciones, m/s²)")]
     [Tooltip("Qué tan fuerte acelera (m/s²).")]
     public float engineAcceleration = 8f;
@@ -474,8 +486,9 @@ public class VehiclePawn : Pawn, ISimulable, IInteractable
         // Todo lo que sigue depende de las llantas: en el aire no hay motor, freno ni agarre.
         if (!grounded) return F;
         // Motor y freno, a lo largo del vehículo. Casi detenido, el mismo pedal de freno da reversa.
-        float brakeAmount = Speed > 0.5f ? brake * brakeForce : brake * engineForce * 0.5f;
-        float fLong = throttle * engineForce - brakeAmount;
+        ResolvePedals(out float pedalThrottle, out float pedalBrake);
+        float brakeAmount = Speed > 0.5f ? pedalBrake * brakeForce : pedalBrake * engineForce * 0.5f;
+        float fLong = pedalThrottle * engineForce - brakeAmount;
         F += fLong * Forward;
         // Rodadura: F = -Crr·m·g, opuesta a la velocidad. Se limita para que
         // nunca invierta el sentido (así el carro se detiene del todo, sin temblar).
@@ -501,9 +514,25 @@ public class VehiclePawn : Pawn, ISimulable, IInteractable
         return Mathf.Sign(value) * (Mathf.Abs(value) - deadZone) / (1f - deadZone);
     }
 
+    /// <summary>
+    /// Acelerador y freno ya filtrados (zona muerta, prioridad del freno, reversa). Lo usan los dos modelos
+    /// de conducción y el parqueo, para que todos se comporten igual con los mismos pedales.
+    /// </summary>
+    void ResolvePedals(out float pedalThrottle, out float pedalBrake)
+    {
+        pedalThrottle = throttle < pedalDeadZone ? 0f : Mathf.Clamp01(throttle);
+        pedalBrake = brake < pedalDeadZone ? 0f : Mathf.Clamp01(brake);
+        bool stopped = Speed <= 0.5f;
+        // El freno gana sobre el acelerador al avanzar; detenido sin reversa, el freno también retiene el carro.
+        if (brakeOverridesThrottle && pedalBrake > 0f && (!stopped || !reverseWithBrake)) pedalThrottle = 0f;
+        // Sin reversa, el freno detenido no empuja hacia atrás.
+        if (!reverseWithBrake && stopped) pedalBrake = 0f;
+    }
+
     void UpdateClassicInputs(float h)
     {
-        float input = Mathf.Clamp(throttle - brake, -1f, 1f);
+        ResolvePedals(out float pedalThrottle, out float pedalBrake);
+        float input = Mathf.Clamp(pedalThrottle - pedalBrake, -1f, 1f);
         bool rising = Mathf.Abs(input) > Mathf.Abs(classicThrottle) && input * classicThrottle >= 0f;
         classicThrottle = Mathf.MoveTowards(classicThrottle, input, (rising ? throttleRise : throttleFall) * h);
         float targetSteering = ApplyDeadZone(steer, steerDeadZone) * maxSteeringRate;
@@ -532,7 +561,8 @@ public class VehiclePawn : Pawn, ISimulable, IInteractable
         float fwdSpeed = Speed;
         float absFwd = Mathf.Abs(fwdSpeed);
         float dirSign = fwdSpeed >= 0f ? 1f : -1f;
-        float input = Mathf.Clamp(throttle - brake, -1f, 1f);
+        ResolvePedals(out float pedalThrottle, out float pedalBrake);
+        float input = Mathf.Clamp(pedalThrottle - pedalBrake, -1f, 1f);
         // 2) ACELERACIÓN / FRENADO / DESACELERACIÓN
         float accel = 0f;
         if (input < -0.01f && fwdSpeed > 0.5f)
@@ -685,7 +715,9 @@ public class VehiclePawn : Pawn, ISimulable, IInteractable
 
     void ParkOnSlopes()
     {
-        if (!grounded || throttle > 0.01f || brake > 0.01f) return;
+        if (!grounded) return;
+        ResolvePedals(out float pedalThrottle, out float pedalBrake);
+        if (pedalThrottle > 0.01f || pedalBrake > 0.01f) return;
         if (Vector3.Angle(groundNormal, Vector3.up) > parkMaxAngle) return;
         Vector3 vNormal = Vector3.Project(v, groundNormal);
         Vector3 vTangent = v - vNormal;

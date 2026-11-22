@@ -21,8 +21,8 @@ public class SelectionFeedback : MonoBehaviour, IPointerEnterHandler
     // ---- Ajusta aquí el estilo ----
     static readonly Color HighlightColor = new Color(1f, 0.84f, 0.29f, 1f); // amarillo #FFD54A
     const float SelectedScale = 1.08f;   // cuánto crece el botón seleccionado (1 = no crece)
-    const float OutlineSize = 4f;        // grosor del borde en píxeles
-    const float ScaleSpeed = 14f;        // qué tan rápido crece/encoge
+    const float OutlineSize = 1f;        // grosor del borde en píxeles
+    const float ScaleSpeed = 1f;        // qué tan rápido crece/encoge
 
     private Selectable selectable;
     private Outline outline;
