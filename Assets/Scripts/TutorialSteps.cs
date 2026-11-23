@@ -74,11 +74,11 @@ public class TutorialSteps : MonoBehaviour
     [SerializeField] private string praiseColor = "#7CFC00";
 
     [Tooltip("Segundos que el juego queda congelado mostrando la felicitación.")]
-    [SerializeField] private float praiseSeconds = 0.8f;
+    [SerializeField] private float praiseSeconds = 0.5f;
 
     [Tooltip("Segundos mínimos que se muestra la siguiente instrucción antes de aceptar que el jugador se mueva. " +
              "Así alcanza a leerla y un control que sigue apretado del paso anterior no la salta.")]
-    [SerializeField] private float readSeconds = 1f;
+    [SerializeField] private float readSeconds = 0.8f;
 
     [Tooltip("Activo: tras cada paso el juego sigue congelado hasta que el jugador se mueva o toque un control. " +
              "Apagado: se descongela solo después de 'Read Seconds'.")]
@@ -363,18 +363,10 @@ public class TutorialSteps : MonoBehaviour
 
         switch (step.condition)
         {
-            case Condition.Look:
-                if (keyboard) return "Mueve el mouse para mirar a tu alrededor.";
-                if (arduino) return "Gira el volante para mirar a tu alrededor.";
-                return "Mueve el stick derecho para mirar a tu alrededor.";
-
             case Condition.Walk:
                 if (keyboard) return "Camina con W A S D (prueba con dos teclas).";
                 if (arduino) return "Camina: pedal de acelerar para ir adelante y pedal de freno para ir atrás.";
                 return "Camina con el stick izquierdo.";
-
-            case Condition.EnterCar:
-                return $"Acércate al carro, míralo y usa {ControlText.Name(GameAction.Interact)} para subirte.";
 
             case Condition.Steer:
                 return "Gira el timón para dirigir el carro a los lados.\n" + Hint(GameAction.Steer);
@@ -385,8 +377,7 @@ public class TutorialSteps : MonoBehaviour
             case Condition.Brake:
                 return "Usa el freno para detenerte. Si ya estás detenido, el freno te da reversa.\n" + Hint(GameAction.Brake);
 
-            case Condition.ChangeView:
-                return "Cambia la vista de la cámara.\n" + Hint(GameAction.ChangeView);
+       
 
             default: // Wait
                 return step.text;
